@@ -139,7 +139,7 @@ export default function ActivityPage() {
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
-        <Select value={filter} onValueChange={setFilter}>
+        <Select value={filter} onValueChange={(v) => setFilter(v ?? "all")}>
           <SelectTrigger className="w-[160px]">
             <SelectValue />
           </SelectTrigger>

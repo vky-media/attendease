@@ -225,7 +225,7 @@ export default function AnalyticsPage() {
                   border: "1px solid var(--border)",
                   fontSize: "12px",
                 }}
-                formatter={(value: number) => [`${value}%`, "Attendance"]}
+                formatter={(value) => [`${value}%`, "Attendance"]}
               />
               <Area
                 type="monotone"
@@ -308,7 +308,7 @@ export default function AnalyticsPage() {
                 border: "1px solid var(--border)",
                 fontSize: "12px",
               }}
-              formatter={(value: number) => [`${value}h`, "Overtime"]}
+              formatter={(value) => [`${value}h`, "Overtime"]}
             />
             <Bar dataKey="hours" fill="#EF9F27" radius={[4, 4, 0, 0]} />
           </BarChart>

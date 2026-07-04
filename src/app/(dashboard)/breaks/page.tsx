@@ -14,11 +14,12 @@ import {
 } from "@/components/ui/select";
 import { employees, getInitials } from "@/lib/mock-data";
 
-type BreakStatus = "idle" | "tea" | "lunch" | "other";
+type BreakType = "tea" | "lunch" | "other";
+type BreakStatus = "idle" | BreakType;
 
 interface LiveBreak {
   employeeId: string;
-  type: BreakStatus;
+  type: BreakType;
   startedAt: string;
   duration: number;
 }
@@ -180,7 +181,7 @@ export default function BreaksPage() {
       {/* Break history */}
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-medium">Today&apos;s break log</h3>
-        <Select value={filter} onValueChange={setFilter}>
+        <Select value={filter} onValueChange={(v) => setFilter(v ?? "all")}>
           <SelectTrigger className="w-[140px]">
             <SelectValue />
           </SelectTrigger>

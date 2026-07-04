@@ -644,7 +644,7 @@ export default function SettingsPage() {
               {emailWeeklyReport && (
                 <div className="max-w-md pl-0">
                   <Label>Send weekly report on</Label>
-                  <Select value={weeklyReportDay} onValueChange={setWeeklyReportDay}>
+                  <Select value={weeklyReportDay} onValueChange={(v) => setWeeklyReportDay(v ?? "monday")}>
                     <SelectTrigger className="mt-1.5 w-40">
                       <SelectValue />
                     </SelectTrigger>

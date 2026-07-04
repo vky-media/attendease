@@ -68,7 +68,7 @@ export default function EmployeesPage() {
             className="pl-9"
           />
         </div>
-        <Select value={deptFilter} onValueChange={setDeptFilter}>
+        <Select value={deptFilter} onValueChange={(v) => setDeptFilter(v ?? "all")}>
           <SelectTrigger className="w-[180px]">
             <Filter className="w-3.5 h-3.5 mr-2 text-muted-foreground" />
             <SelectValue placeholder="Department" />
@@ -128,19 +128,13 @@ export default function EmployeesPage() {
                 </TableCell>
                 <TableCell>
                   <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <div role="button" tabIndex={0} className="p-1 rounded hover:bg-muted cursor-pointer">
+                    <DropdownMenuTrigger className="p-1 rounded hover:bg-muted cursor-pointer">
                         <MoreHorizontal className="w-4 h-4 text-muted-foreground" />
-                      </div>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem asChild>
-                        <Link href={`/employees/${emp.id}`}>View profile</Link>
-                      </DropdownMenuItem>
+                      <DropdownMenuItem render={<Link href={`/employees/${emp.id}`} />}>View profile</DropdownMenuItem>
                       <DropdownMenuItem>Edit details</DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link href="/attendance">View attendance</Link>
-                      </DropdownMenuItem>
+                      <DropdownMenuItem render={<Link href="/attendance" />}>View attendance</DropdownMenuItem>
                       <DropdownMenuItem className="text-destructive">
                         Deactivate
                       </DropdownMenuItem>

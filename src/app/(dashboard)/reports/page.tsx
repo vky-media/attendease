@@ -113,7 +113,7 @@ export default function ReportsPage() {
             <TabsTrigger value="monthly">Monthly</TabsTrigger>
           </TabsList>
         </Tabs>
-        <Select value={month} onValueChange={setMonth}>
+        <Select value={month} onValueChange={(v) => setMonth(v ?? "june")}>
           <SelectTrigger className="w-[160px]">
             <SelectValue />
           </SelectTrigger>
