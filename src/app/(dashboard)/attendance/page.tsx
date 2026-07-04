@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Search, Download, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, Download, ChevronLeft, ChevronRight, Lock } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -24,19 +24,26 @@ import {
 } from "@/components/ui/select";
 import { StatusBadge } from "@/components/ui/status-badge";
 import {
-  employees,
   todayAttendance,
   getEmployee,
   getInitials,
 } from "@/lib/mock-data";
+import { useAuth, isManager, isAdmin } from "@/lib/auth-context";
 import { format } from "date-fns";
 
 export default function AttendancePage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [currentDate, setCurrentDate] = useState(new Date());
+  const { user } = useAuth();
+
+  const role = user?.role || "employee";
+  const myId = user?.employee.id;
+  const isRegularEmployee = role === "employee";
 
   const records = todayAttendance.filter((rec) => {
+    if (isRegularEmployee && rec.employeeId !== myId) return false;
+
     const emp = getEmployee(rec.employeeId);
     if (!emp) return false;
     const matchesSearch = emp.name
@@ -47,13 +54,76 @@ export default function AttendancePage() {
     return matchesSearch && matchesStatus;
   });
 
+  if (isRegularEmployee) {
+    const myRecord = records[0];
+    const emp = myRecord ? getEmployee(myRecord.employeeId) : null;
+
+    return (
+      <div className="max-w-3xl">
+        <div className="mb-6">
+          <h1 className="text-lg font-semibold tracking-tight">My attendance</h1>
+          <p className="text-sm text-muted-foreground">
+            Your attendance record for today
+          </p>
+        </div>
+
+        {myRecord && emp ? (
+          <Card className="p-6">
+            <div className="flex items-center gap-4 mb-6">
+              <Avatar className="w-12 h-12">
+                <AvatarFallback className="bg-primary/10 text-primary text-sm font-medium">
+                  {getInitials(emp.name)}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <p className="font-semibold tracking-tight">{emp.name}</p>
+                <p className="text-sm text-muted-foreground">{emp.department} &middot; {emp.designation}</p>
+              </div>
+              <div className="ml-auto">
+                <StatusBadge status={myRecord.status} />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="bg-muted rounded-lg p-3">
+                <p className="text-[11px] text-muted-foreground uppercase tracking-wider">Check in</p>
+                <p className="text-base font-mono font-medium mt-1">{myRecord.checkIn || "—"}</p>
+              </div>
+              <div className="bg-muted rounded-lg p-3">
+                <p className="text-[11px] text-muted-foreground uppercase tracking-wider">Check out</p>
+                <p className="text-base font-mono font-medium mt-1">{myRecord.checkOut || "—"}</p>
+              </div>
+              <div className="bg-muted rounded-lg p-3">
+                <p className="text-[11px] text-muted-foreground uppercase tracking-wider">Working hrs</p>
+                <p className="text-base font-mono font-medium mt-1">{myRecord.workingHours ? `${myRecord.workingHours}h` : "—"}</p>
+              </div>
+              <div className="bg-muted rounded-lg p-3">
+                <p className="text-[11px] text-muted-foreground uppercase tracking-wider">Overtime</p>
+                <p className="text-base font-mono font-medium mt-1">{myRecord.overtime ? `${myRecord.overtime}h` : "—"}</p>
+              </div>
+            </div>
+          </Card>
+        ) : (
+          <Card className="p-8 text-center">
+            <p className="text-muted-foreground">No attendance record found for today.</p>
+          </Card>
+        )}
+
+        <div className="mt-6 flex items-center gap-2 text-sm text-muted-foreground bg-muted/50 rounded-lg p-3">
+          <Lock className="w-4 h-4 shrink-0" />
+          <p>Full attendance records are only accessible to managers and administrators.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-5xl">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-lg font-medium">Attendance</h1>
+          <h1 className="text-lg font-semibold tracking-tight">Attendance</h1>
           <p className="text-sm text-muted-foreground">
-            Daily attendance records
+            {isAdmin(role) ? "All employee attendance records" : "Team attendance records"}
           </p>
         </div>
         <Button variant="outline">
