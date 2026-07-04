@@ -231,32 +231,33 @@ export default function LoginPage() {
         </div>
 
         {/* Network status indicator */}
-        <div className={`flex items-center gap-2 text-sm px-3 py-2 rounded-lg mb-3 ${
-          isChecking
-            ? "bg-muted text-muted-foreground"
-            : isOffice
-              ? "bg-status-present-bg text-status-present-text"
-              : "bg-status-absent-bg text-status-absent-text"
-        }`}>
-          {isChecking ? (
-            <>
-              <Loader2 className="w-4 h-4 animate-spin" />
-              <span>Detecting network...</span>
-            </>
-          ) : isOffice ? (
-            <>
-              <Wifi className="w-4 h-4" />
-              <span>{demoOverride ? "Demo mode — office WiFi simulated" : `Connected to ${networkSettings.officeWifiSsid || "office"} — IP ${currentIp} matches office`}</span>
-            </>
-          ) : (
-            <>
-              <WifiOff className="w-4 h-4" />
-              <span>Your IP {currentIp} doesn&apos;t match office — connect to {networkSettings.officeWifiSsid || "office"} WiFi</span>
-            </>
-          )}
-        </div>
+        {isChecking ? (
+          <div className="flex items-center gap-2 text-sm px-3 py-2 rounded-lg mb-3 bg-muted text-muted-foreground">
+            <Loader2 className="w-4 h-4 animate-spin" />
+            <span>Verifying network access...</span>
+          </div>
+        ) : isOffice ? (
+          <div className="flex items-center gap-2 text-sm px-3 py-2 rounded-lg mb-3 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400">
+            <Wifi className="w-4 h-4" />
+            <span>{demoOverride ? "Demo mode active" : "Office network verified"}</span>
+          </div>
+        ) : (
+          <div className="rounded-lg mb-3 border border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-950/30 p-4">
+            <div className="flex items-center gap-2 text-red-700 dark:text-red-400 font-medium mb-2">
+              <WifiOff className="w-5 h-5" />
+              <span>Access Restricted</span>
+            </div>
+            <p className="text-sm text-red-600 dark:text-red-400/80">
+              You must be connected to the <strong>{networkSettings.officeWifiSsid}</strong> office WiFi network to sign in.
+            </p>
+            <p className="text-xs text-red-500/70 dark:text-red-400/50 mt-1.5">
+              Your IP: {currentIp} • Required: {networkSettings.officePublicIp}
+            </p>
+          </div>
+        )}
 
-        {/* Mode toggle */}
+        {/* Mode toggle — only show when access is allowed */}
+        {(isOffice || isChecking) && (
         <div className="flex gap-1 bg-muted rounded-lg p-1 mb-3">
           <button
             onClick={() => { setMode("credentials"); setError(""); }}
@@ -277,8 +278,27 @@ export default function LoginPage() {
             QR Code
           </button>
         </div>
+        )}
 
-        {mode === "credentials" ? (
+        {!isOffice && !isChecking && !demoOverride ? (
+          <Card className="p-6 text-center">
+            <div className="w-16 h-16 rounded-full bg-red-100 dark:bg-red-950/40 flex items-center justify-center mx-auto mb-4">
+              <Shield className="w-8 h-8 text-red-500" />
+            </div>
+            <h2 className="font-semibold text-lg mb-1">Login Blocked</h2>
+            <p className="text-sm text-muted-foreground mb-4">
+              This application can only be accessed from the office WiFi network ({networkSettings.officeWifiSsid}).
+            </p>
+            <div className="text-xs text-muted-foreground space-y-1 bg-muted rounded-lg p-3">
+              <p>Please ensure you are:</p>
+              <ul className="list-disc list-inside text-left space-y-0.5 mt-1">
+                <li>Connected to <strong>{networkSettings.officeWifiSsid}</strong> WiFi</li>
+                <li>Physically present in the office</li>
+                <li>Not using a VPN or mobile hotspot</li>
+              </ul>
+            </div>
+          </Card>
+        ) : mode === "credentials" ? (
           <>
             <Card className="p-6">
               <form onSubmit={handleSubmit} className="space-y-4">

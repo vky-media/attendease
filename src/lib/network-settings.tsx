@@ -17,7 +17,7 @@ interface NetworkSettingsContextValue {
 const STORAGE_KEY = "attendease_network_settings";
 
 const defaults: NetworkSettings = {
-  officePublicIp: "",
+  officePublicIp: "60.243.46.219",
   officeWifiSsid: "DIGITFELLAS",
   ipValidationEnabled: true,
   wifiValidationEnabled: true,
